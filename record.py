@@ -124,34 +124,84 @@ class HarvestMatch:
         return result
 
     def as_mongo_match(self) -> dict:
+        key = f'${self.key}'
+
         match self.operator:
+            # https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexMatch/
             case '=':
                 result = {
                     "$regexMatch": {
-                        "input": self.value
+                        "input": key,
+                        "regex": self.value
                     }
                 }
 
             case '<=':
-                result = self._record.get(self.key) <= self.value
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/lte/
+                result = {
+                    "$lte": {
+                        [
+                            key,
+                            self.value
+                        ]
+                    }
+                }
 
             case '>=':
-                result = self._record.get(self.key) >= self.value
-
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/gte/
+                result = {
+                    "$gte": {
+                        [
+                            key,
+                            self.value
+                        ]
+                    }
+                }
             case '==':
-                result = self._record.get(self.key) == self.value
-
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/
+                result = {
+                    self.key: self.value
+                }
             case '!=':
-                result = self._record.get(self.key) != self.value
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/ne/
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexMatch/
+                result = {
+                    "$ne": [
+                        {
+                            "$regexMatch": {
+                                "input": key,
+                                "pattern": self.value
+                            }
+                        }
+                    ]
+                }
 
             case '<':
-                result = self._record.get(self.key) < self.value
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/lt/
+                result = {
+                    "$lt": {
+                        [
+                            key,
+                            self.value
+                        ]
+                    }
+                }
 
             case '>':
-                result = self._record.get(self.key) > self.value
+                # https://www.mongodb.com/docs/manual/reference/operator/aggregation/gt/
+                result = {
+                    "$gt": {
+                        [
+                            key,
+                            self.value
+                        ]
+                    }
+                }
+
+            case _:
+                raise ValueError('No valid matching statement returned')
 
         return result
-
 
 
 class HarvestRecord(OrderedDict):
