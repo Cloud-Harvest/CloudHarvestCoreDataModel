@@ -17,7 +17,7 @@ class TestMatching(unittest.TestCase):
         syntax = 'key1=value1'
         match = HarvestMatch(record, syntax)
         self.assertTrue(match.match())
-        self.assertEqual(match.final_match_operation, 'value1 = value1')
+        self.assertEqual(match.final_match_operation, 'value1=value1')
         self.assertTrue(match.is_match)
 
         # Test creating a HarvestMatch object with a non-matching record
@@ -25,7 +25,7 @@ class TestMatching(unittest.TestCase):
         syntax = 'key1=value2'
         match = HarvestMatch(record, syntax)
         self.assertFalse(match.match())
-        self.assertEqual(match.final_match_operation, 'value1 = value2')
+        self.assertEqual(match.final_match_operation, 'value1=value2')
         self.assertFalse(match.is_match)
 
     def test_HarvestMatchSet(self):

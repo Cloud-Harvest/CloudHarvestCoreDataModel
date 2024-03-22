@@ -144,7 +144,7 @@ class HarvestMatch:
         else:
             result = _MATCH_OPERATIONS[self.operator](record_key_value, matching_value)
 
-        self.final_match_operation = f'{record_key_value}{self.operator}{matching_value} = {result}'
+        self.final_match_operation = f'{record_key_value}{self.operator}{matching_value}'
 
         self.is_match = result
 
