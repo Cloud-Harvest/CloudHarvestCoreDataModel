@@ -50,6 +50,26 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
+    def add_match(self, syntax: str):
+        """
+        Add a match to the record set.
+
+        :param syntax: The match syntax to add
+        """
+
+        [record.match(syntax) for record in self]
+
+        return self
+
+    def clear_matches(self):
+        """
+        Clear all matches from the record set.
+        """
+
+        [record.clear_matches() for record in self]
+
+        return self
+
     def create_index(self, index_name: str, *fields: List[str]):
         """
         Create an index for the record set.
