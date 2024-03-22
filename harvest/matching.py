@@ -3,13 +3,17 @@ from collections import OrderedDict
 from re import findall
 from typing import List
 
+# The order of _MATCH_OPERATIONS's keys is important. The keys should be ordered from longest to shortest to ensure that
+# the longest match is attempted first. For example, '==' should be before '=' to ensure that '==' is matched
+# before '='. This allows us to perform split() operations on the syntax without accidentally splitting on a substring
+# that is part of the operator.
 _MATCH_OPERATIONS = {
         '==': operator.eq,  # Checks if 'a' is equal to 'b'
-        '>': operator.gt,   # Checks if 'a' is greater than 'b'
-        '<': operator.lt,   # Checks if 'a' is less than 'b'
         '>=': operator.ge,  # Checks if 'a' is greater than or equal to 'b'
         '<=': operator.le,  # Checks if 'a' is less than or equal to 'b'
         '!=': operator.ne,  # Checks if 'a' is not equal to 'b'
+        '>': operator.gt,   # Checks if 'a' is greater than 'b'
+        '<': operator.lt,   # Checks if 'a' is less than 'b'
         '=': findall        # Checks if 'a' contains 'b'
     }
 
@@ -108,49 +112,39 @@ class HarvestMatch:
     def match(self) -> bool:
         self.key, self.value = self._input.split(self.operator, maxsplit=1)
 
-        # check if there is a function being performed on the self.key or self.value
-        from re import match
-        if match('^.*\\(.*\\)$', self.key):
-            function = self.key[0:str(self.key).find('(')]
-            arguments = self.key[str(self.key).find('(') + 1:-1].split(',')
-            self.key = arguments[0]
-            arguments[0] = self._record.get(self.key)
+        from harvest.functions import is_bool, is_datetime, is_null, is_number
+        matching_value = self.value
+        record_key_value = self._record.get(self.key)
 
-            from importlib import import_module
-            functions = import_module('functions')
+        # convert types if they do not match
+        if type(matching_value) is not type(record_key_value):
+            if is_bool(matching_value):
+                cast_variables_as = 'bool'
 
-            _key = getattr(functions, function)(*arguments)
+            elif is_datetime(matching_value):
+                cast_variables_as = 'datetime'
 
-        else:
-            _key = self._record.get(self.key)
+            elif is_null(matching_value):
+                cast_variables_as = 'null'
 
-        from functions import is_number
-        _key_is_number = is_number(value=_key)
+            elif is_number(matching_value):
+                cast_variables_as = 'float'
 
-        # check if there are any function calls in this part of the match logic
-        if match('^.*\\(.*\\)$', self.value):
-            function = self.value[0:str(self.value).find('(')]
-            arguments = self.value[str(self.value).find('(') + 1:str(self.value).find(')')].split(',')
+            else:
+                cast_variables_as = 'str'
 
-            from importlib import import_module
-            functions = import_module('functions')
-
-            _value = getattr(functions, function)(*arguments)
-
-        else:
-            _value = self.value
-
-        # automatically cast the _value as a number if the _key is a number and the _value can be expressed as a number
-        _value = float(_value) if isinstance(_key, (int or float)) and is_number(value=_value) else _value
+            from functions import cast
+            matching_value = cast(matching_value, cast_variables_as)
+            record_key_value = cast(record_key_value, cast_variables_as)
 
         from re import findall, IGNORECASE
         if self.operator == '=':
-            result = findall(_value, _key, IGNORECASE)
+            result = findall(pattern=matching_value, string=record_key_value, flags=IGNORECASE)
 
         else:
-            result = _MATCH_OPERATIONS[self.operator](_key, _value)
+            result = _MATCH_OPERATIONS[self.operator](record_key_value, matching_value)
 
-        self.final_match_operation = f'{_key} {self.operator} {_value}'
+        self.final_match_operation = f'{record_key_value}{self.operator}{matching_value} = {result}'
 
         self.is_match = result
 
