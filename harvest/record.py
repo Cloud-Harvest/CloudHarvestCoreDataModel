@@ -191,15 +191,23 @@ class HarvestRecord(OrderedDict):
 
         return self
 
-    def match(self, match_statement: str):
+    def clear_matches(self):
+        """
+        Clear the matches of the record.
+        """
+
+        self.matching_expressions.clear()
+        self.non_matching_expressions.clear()
+
+    def match(self, syntax: str):
         """
         Check if the record matches a statement.
 
-        :param match_statement: the match statement
+        :param syntax: the match statement
         :return: True if the record matches the statement, False otherwise
         """
 
-        match = HarvestMatch(record=self, syntax=match_statement)
+        match = HarvestMatch(record=self, syntax=syntax)
         match.match()
 
         if match.is_match:
@@ -208,7 +216,7 @@ class HarvestRecord(OrderedDict):
         else:
             self.non_matching_expressions.append(match)
 
-        return match.is_match
+        return self
 
     def remove_key(self, key: str):
         """
