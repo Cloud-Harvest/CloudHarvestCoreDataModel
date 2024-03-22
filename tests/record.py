@@ -12,13 +12,36 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Set up a HarvestRecord object for use in tests
         """
-        self.record = HarvestRecord(key1='value1', key2='value2', key4='4')
+        from datetime import datetime
+        self.record = HarvestRecord(key1='value1', key2='value2')
 
     def test_add_freshness(self):
         """
         Test the add_freshness method
         """
-        # This method is difficult to test without mocking datetime, as it depends on the current time
+        from datetime import datetime, timezone
+
+        self.record['Active'] = True
+        self.record['LastSeen'] = str(datetime(2020, 1, 1, tzinfo=timezone.utc))
+
+        # test a stale record state
+        self.record.add_freshness()
+        self.assertEqual(self.record['f'], 'S')
+
+        self.record['LastSeen'] = str(datetime.now(tz=timezone.utc))
+
+        # test a fresh record state
+        self.record.add_freshness()
+        self.assertEqual(self.record['f'], 'F')
+
+        # test an inactive record state
+        self.record['Active'] = False
+        self.record.add_freshness()
+        self.assertEqual(self.record['f'], 'I')
+
+        # remove the fields used for this test
+        self.record.pop('Active')
+        self.record.pop('LastSeen')
 
     def test_add_key_from_keys(self):
         """
@@ -31,7 +54,9 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the assign_elements_at_index_to_key method
         """
-        # This method is difficult to test without a source_column that is an iterable
+        self.record['list_example'] = ['key1', 'key2', 'key3', 'key4']
+        self.record.assign_elements_at_index_to_key('list_example', 'new_key', 0, 2, ',')
+        self.assertEqual(self.record['new_key'], 'key1,key2')
 
     def test_cast(self):
         """
@@ -40,8 +65,12 @@ class TestHarvestRecord(unittest.TestCase):
         self.record.cast('key1', 'int')
         self.assertEqual(self.record['key1'], None)
 
+        self.record['key4'] = '4'
+
         self.record.cast('key4', 'int')
         self.assertEqual(self.record['key4'], 4)
+
+        self.record.pop('key4')
 
     def test_copy_key(self):
         """
@@ -54,7 +83,33 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the dict_from_json_string method
         """
-        # This method is difficult to test without a source_key that is a JSON string
+
+        # store the test record for later restoration
+        original_record = self.record.copy()
+
+        # Test 'key' operation
+        self.record['json'] = '{"key1": "value1", "key2": "value2"}'
+        self.record.dict_from_json_string('json', 'key', 'new_key')
+        self.assertEqual(self.record['new_key'], {"key1": "value1", "key2": "value2"})
+
+        # replace the original record
+        self.record.update(original_record)
+
+        # Test 'merge' operation
+        self.record['json'] = '{"key3": "value3"}'
+        self.record.dict_from_json_string('json', 'merge')
+        self.assertEqual(self.record['key3'], "value3")
+
+        # replace the original record
+        self.record.update(original_record)
+
+        # Test 'replace' operation
+        self.record['json'] = '{"key4": "value4"}'
+        self.record.dict_from_json_string('json', 'replace')
+        self.assertEqual(self.record['json'], {"key4": "value4"})
+
+        # replace the original record
+        self.record.update(original_record)
 
     def test_first_not_null_value(self):
         """
@@ -66,19 +121,27 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the flatten method
         """
-        # This method is difficult to test without a nested dictionary
+        record = HarvestRecord()
+
+        record['key1'] = {'key2': {'key3': 'value'}}
+        record.flatten()
+
+        self.assertEqual(record['key1.key2.key3'], 'value')
+        self.assertTrue(record.is_flat)
 
     def test_is_matched_record(self):
         """
         Test the is_matched_record method
         """
-        self.assertTrue(self.record.is_matched_record())
+        self.assertTrue(self.record.is_matched_record)
 
     def test_key_value_list_to_dict(self):
         """
         Test the key_value_list_to_dict method
         """
-        # This method is difficult to test without a source_column that is a list of dictionaries
+        self.record['KV'] = [{'Name': 'name', 'Value': 'value'}]
+        self.record.key_value_list_to_dict('KV')
+        self.assertEqual(self.record['KV'], {'name': 'value'})
 
     def test_match(self):
         """
@@ -86,12 +149,6 @@ class TestHarvestRecord(unittest.TestCase):
         """
         self.assertTrue(self.record.match('key1=value1'))
         self.assertFalse(self.record.match('key1=value2'))
-
-    def test_md5_hash(self):
-        """
-        Test the md5_hash method
-        """
-        # This method is difficult to test as the output depends on the current state of the record
 
     def test_remove_key(self):
         """
@@ -121,19 +178,35 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the split_key method
         """
-        # This method is difficult to test without a source_key that is a string with a delimiter
+        self.record['key5'] = 'value1 value2 value3'
+        self.record.split_key('key5', 'new_key')
+        self.assertEqual(self.record['new_key'], ['value1', 'value2', 'value3'])
 
     def test_substring(self):
         """
         Test the substring method
         """
-        # This method is difficult to test without a source_key that is a string
+        self.record['key6'] = 'value1'
+        self.record.substring('key6', 0, 5, target_key='key7')
+        self.assertEqual(self.record['key7'], 'value')
+
+        self.record.substring('key6', start=-1, target_key='key7')
+        self.assertEqual(self.record['key7'], '1')
 
     def test_unflatten(self):
         """
         Test the unflatten method
         """
-        # This method is difficult to test without a flattened dictionary
+
+        record = HarvestRecord()
+
+        record['key1.key2.key3'] = 'value'
+        record.is_flat = True
+
+        record.unflatten()
+
+        self.assertEqual(record['key1']['key2']['key3'], 'value')
+        self.assertFalse(record.is_flat)
 
 if __name__ == '__main__':
     unittest.main()
