@@ -134,14 +134,17 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         new_records = []
         for record in self:
-
-            if len(record.get(source_key, [])) == 0 and preserve_null_and_empty_keys is False:
+            if source_key not in record and preserve_null_and_empty_keys is False:
                 continue
 
-            for item in record[source_key]:
-                new_record = record.copy()
-                new_record[source_key] = item
-                new_records.append(new_record)
+            elif isinstance(record[source_key], (list or tuple)):
+                for item in record[source_key]:
+                    new_record = record.copy()
+                    new_record[source_key] = item
+                    new_records.append(new_record)
+
+            else:
+                new_records.append(record)
 
         self.clear()
         self.add(data=new_records)
