@@ -199,7 +199,7 @@ class HarvestRecord(OrderedDict):
         self.matching_expressions.clear()
         self.non_matching_expressions.clear()
 
-    def match(self, syntax: str):
+    def match(self, syntax: str) -> bool:
         """
         Check if the record matches a statement.
 
@@ -216,7 +216,7 @@ class HarvestRecord(OrderedDict):
         else:
             self.non_matching_expressions.append(match)
 
-        return self
+        return match.is_match
 
     def remove_key(self, key: str):
         """
