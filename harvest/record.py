@@ -1,6 +1,6 @@
 from typing import List, Literal
 from collections import OrderedDict
-from matching import HarvestMatch
+from harvest.matching import HarvestMatch
 
 
 class HarvestRecord(OrderedDict):
@@ -29,7 +29,7 @@ class HarvestRecord(OrderedDict):
         :param aging_range: middle and upper bound of the freshness range, defaults to 43200
         """
 
-        from .functions import cast
+        from harvest.functions import cast
         from datetime import datetime, timezone
 
         active = self.get('Harvest', {}).get('Dates', {}).get('Active') or self.get('Active')
@@ -102,7 +102,7 @@ class HarvestRecord(OrderedDict):
         :param target_key: when provided, a new key will be created with the cast value, defaults to None which overrides the existing key value.
         """
 
-        from functions import cast
+        from harvest.functions import cast
 
         self[target_key or source_key] = cast(self[source_key], format_string)
 
@@ -183,7 +183,7 @@ class HarvestRecord(OrderedDict):
         :param preserve_original: whether to preserve the original key, defaults to False
         """
 
-        from functions import key_value_list_to_dict
+        from harvest.functions import key_value_list_to_dict
         self[target_key or source_key] = key_value_list_to_dict(value=self[source_key], key_name=name_key, value_name=value_key)
 
         if not preserve_original and target_key and target_key != source_key:

@@ -133,7 +133,7 @@ class HarvestMatch:
             else:
                 cast_variables_as = 'str'
 
-            from functions import cast
+            from harvest.functions import cast
             matching_value = cast(matching_value, cast_variables_as)
             record_key_value = cast(record_key_value, cast_variables_as)
 
