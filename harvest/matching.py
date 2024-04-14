@@ -112,7 +112,7 @@ class HarvestMatch:
     def match(self) -> bool:
         self.key, self.value = self._input.split(self.operator, maxsplit=1)
 
-        from harvest.functions import is_bool, is_datetime, is_null, is_number
+        from functions import is_bool, is_datetime, is_null, is_number
         matching_value = self.value
         record_key_value = self._record.get(self.key)
 
@@ -133,7 +133,7 @@ class HarvestMatch:
             else:
                 cast_variables_as = 'str'
 
-            from harvest.functions import cast
+            from functions import cast
             matching_value = cast(matching_value, cast_variables_as)
             record_key_value = cast(record_key_value, cast_variables_as)
 
