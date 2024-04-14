@@ -208,5 +208,6 @@ class TestHarvestRecord(unittest.TestCase):
         self.assertEqual(record['key1']['key2']['key3'], 'value')
         self.assertFalse(record.is_flat)
 
+
 if __name__ == '__main__':
     unittest.main()
