@@ -1,6 +1,7 @@
 import unittest
 from collections import OrderedDict
-from harvest.record import HarvestRecord
+from importlib import import_module
+record = import_module('core-data-model.record')
 
 
 class TestHarvestRecord(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestHarvestRecord(unittest.TestCase):
         Set up a HarvestRecord object for use in tests
         """
         from datetime import datetime
-        self.record = HarvestRecord(key1='value1', key2='value2')
+        self.record = record.HarvestRecord(key1='value1', key2='value2')
 
     def test_add_freshness(self):
         """
@@ -121,13 +122,13 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the flatten method
         """
-        record = HarvestRecord()
+        r = record.HarvestRecord()
 
-        record['key1'] = {'key2': {'key3': 'value'}}
-        record.flatten()
+        r['key1'] = {'key2': {'key3': 'value'}}
+        r.flatten()
 
-        self.assertEqual(record['key1.key2.key3'], 'value')
-        self.assertTrue(record.is_flat)
+        self.assertEqual(r['key1.key2.key3'], 'value')
+        self.assertTrue(r.is_flat)
 
     def test_is_matched_record(self):
         """
@@ -198,15 +199,15 @@ class TestHarvestRecord(unittest.TestCase):
         Test the unflatten method
         """
 
-        record = HarvestRecord()
+        r = record.HarvestRecord()
 
-        record['key1.key2.key3'] = 'value'
-        record.is_flat = True
+        r['key1.key2.key3'] = 'value'
+        r.is_flat = True
 
-        record.unflatten()
+        r.unflatten()
 
-        self.assertEqual(record['key1']['key2']['key3'], 'value')
-        self.assertFalse(record.is_flat)
+        self.assertEqual(r['key1']['key2']['key3'], 'value')
+        self.assertFalse(r.is_flat)
 
 
 if __name__ == '__main__':

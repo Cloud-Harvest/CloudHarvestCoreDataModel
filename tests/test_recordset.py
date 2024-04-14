@@ -1,7 +1,6 @@
 import unittest
-from collections import OrderedDict
-from harvest.record import HarvestRecord
-from harvest.recordset import HarvestRecordSet
+from importlib import import_module
+recordset = import_module('core-data-model.recordset')
 
 
 class TestHarvestRecordSet(unittest.TestCase):
@@ -13,7 +12,7 @@ class TestHarvestRecordSet(unittest.TestCase):
         """
         Set up a HarvestRecordSet object for use in tests
         """
-        self.recordset = HarvestRecordSet(data=[{'key1': 'value1', 'key2': 'value2'}])
+        self.recordset = recordset.HarvestRecordSet(data=[{'key1': 'value1', 'key2': 'value2'}])
 
     def test_add(self):
         """
@@ -131,18 +130,18 @@ class TestHarvestRecordSet(unittest.TestCase):
         """
         Test the unwind method
         """
-        with HarvestRecordSet() as recordset:
-            recordset.add(data=[{'key1': 'value1', 'key2': 'value2'}])
-            recordset.unwind('key1', preserve_null_and_empty_keys=True)
-            self.assertEqual(len(recordset), 1)
-            self.assertEqual(recordset[0]['key1'], 'value1')
+        with recordset.HarvestRecordSet() as rs:
+            rs.add(data=[{'key1': 'value1', 'key2': 'value2'}])
+            rs.unwind('key1', preserve_null_and_empty_keys=True)
+            self.assertEqual(len(rs), 1)
+            self.assertEqual(rs[0]['key1'], 'value1')
 
-            recordset[0]['key3'] = ['value3_a', 'value3_b', 'value3_c']
-            recordset.unwind('key3')
-            self.assertEqual(len(recordset), 3)
-            self.assertEqual(recordset[0]['key3'], 'value3_a')
-            self.assertEqual(recordset[1]['key3'], 'value3_b')
-            self.assertEqual(recordset[2]['key3'], 'value3_c')
+            rs[0]['key3'] = ['value3_a', 'value3_b', 'value3_c']
+            rs.unwind('key3')
+            self.assertEqual(len(rs), 3)
+            self.assertEqual(rs[0]['key3'], 'value3_a')
+            self.assertEqual(rs[1]['key3'], 'value3_b')
+            self.assertEqual(rs[2]['key3'], 'value3_c')
 
 
 if __name__ == '__main__':

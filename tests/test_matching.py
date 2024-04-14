@@ -1,6 +1,7 @@
 import unittest
 from collections import OrderedDict
-from harvest.matching import HarvestMatch, HarvestMatchSet
+from importlib import import_module
+matching = import_module('core-data-model.matching')
 
 
 class TestMatching(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestMatching(unittest.TestCase):
         # Test creating a HarvestMatch object and calling the match method
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value1'
-        match = HarvestMatch(record, syntax)
+        match = matching.HarvestMatch(record, syntax)
         self.assertTrue(match.match())
         self.assertEqual(match.final_match_operation, 'value1=value1')
         self.assertTrue(match.is_match)
@@ -23,7 +24,7 @@ class TestMatching(unittest.TestCase):
         # Test creating a HarvestMatch object with a non-matching record
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value2'
-        match = HarvestMatch(record, syntax)
+        match = matching.HarvestMatch(record, syntax)
         self.assertFalse(match.match())
         self.assertEqual(match.final_match_operation, 'value1=value2')
         self.assertFalse(match.is_match)
@@ -36,14 +37,14 @@ class TestMatching(unittest.TestCase):
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value1'
         matches = ['key1=value1', 'key2=value2']
-        match_set = HarvestMatchSet(record, syntax, matches)
+        match_set = matching.HarvestMatchSet(record, syntax, matches)
         self.assertEqual(len(match_set.matches), 2)
 
         # Test creating a HarvestMatchSet object with no matches
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value1'
         matches = []
-        match_set = HarvestMatchSet(record, syntax, matches)
+        match_set = matching.HarvestMatchSet(record, syntax, matches)
         self.assertEqual(len(match_set.matches), 0)
 
 
