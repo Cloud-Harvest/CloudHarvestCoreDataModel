@@ -1,5 +1,5 @@
 from typing import Dict, List, Literal
-from record import HarvestRecord
+from .record import HarvestRecord
 
 
 class HarvestRecordSet(List[HarvestRecord]):
