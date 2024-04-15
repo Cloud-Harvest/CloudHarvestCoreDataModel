@@ -18,7 +18,7 @@ class HarvestRecordSet(List[HarvestRecord]):
         if data:
             self.add(data=data)
 
-    def __enter__(self):
+    def __enter__(self) -> 'HarvestRecordSet':
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -30,10 +30,10 @@ class HarvestRecordSet(List[HarvestRecord]):
         return self
 
     @property
-    def keys(self):
-        return list(set([key for record in self for key in record.keys()]))
+    def keys(self) -> List[str]:
+        return sorted(list(set([key for record in self for key in record.keys()])))
 
-    def add(self, data: List[dict or HarvestRecord]):
+    def add(self, data: List[dict or HarvestRecord]) -> 'HarvestRecordSet':
         """
         Add a list of records to the record set.
 
@@ -50,7 +50,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def add_match(self, syntax: str):
+    def add_match(self, syntax: str) -> 'HarvestRecordSet':
         """
         Add a match to the record set.
 
@@ -61,7 +61,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def clear_matches(self):
+    def clear_matches(self) -> 'HarvestRecordSet':
         """
         Clear all matches from the record set.
         """
@@ -70,7 +70,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def create_index(self, index_name: str, *fields: List[str]):
+    def create_index(self, index_name: str, *fields: List[str]) -> 'HarvestRecordSet':
         """
         Create an index for the record set.
 
@@ -85,7 +85,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def drop_index(self, index_name: str):
+    def drop_index(self, index_name: str) -> 'HarvestRecordSet':
         """
         Drop an index from the record set.
 
@@ -96,7 +96,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def get_matched_records(self):
+    def get_matched_records(self) -> 'HarvestRecordSet':
         """
         Get all records in the record set that are a match.
 
@@ -105,7 +105,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return HarvestRecordSet(data=[record for record in self if record.is_matched_record])
 
-    def modify_records(self, function: str, arguments: dict):
+    def modify_records(self, function: str, arguments: dict) -> 'HarvestRecordSet':
         """
         Modify records in the record set by calling a function on each record.
 
@@ -117,7 +117,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def remove_duplicates(self):
+    def remove_duplicates(self) -> 'HarvestRecordSet':
         """
         Remove duplicate records from the record set.
         """
@@ -132,7 +132,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def remove_unmatched_records(self):
+    def remove_unmatched_records(self) -> 'HarvestRecordSet':
         """
         Remove all records in the record set that are not a match.
         """
@@ -144,7 +144,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def unwind(self, source_key: str, preserve_null_and_empty_keys: bool = True):
+    def unwind(self, source_key: str, preserve_null_and_empty_keys: bool = True) -> 'HarvestRecordSet':
         """
         Unwind a list of records in the record set into separate records.
 
@@ -174,15 +174,15 @@ class HarvestRecordSet(List[HarvestRecord]):
 
 class HarvestRecordSets(Dict[str, HarvestRecordSet]):
 
-    def add(self, recordset_name: str, recordset: HarvestRecordSet):
+    def add(self, recordset_name: str, recordset: HarvestRecordSet) -> 'HarvestRecordSets':
         self[recordset_name] = recordset
 
         return self
 
-    def index(self, recordset_name: str, index_name: str, fields: List[str]):
-        return self[recordset_name]
+    def index(self, recordset_name: str, index_name: str, fields: List[str]) -> 'HarvestRecordSets':
+        return self
 
-    def join(self, new_recordset_name: str, recordset_names: List[str], index_name: str, join_type: Literal['inner', 'outer', 'left', 'right']):
+    def join(self, new_recordset_name: str, recordset_names: List[str], index_name: str, join_type: Literal['inner', 'outer', 'left', 'right']) -> 'HarvestRecordSets':
         return self
 
     def list(self) -> List[dict]:
@@ -196,7 +196,7 @@ class HarvestRecordSets(Dict[str, HarvestRecordSet]):
             for name, recordset in self.items()
         ]
 
-    def purge(self):
+    def purge(self) -> 'HarvestRecordSets':
         self.clear()
 
         return self
@@ -204,53 +204,11 @@ class HarvestRecordSets(Dict[str, HarvestRecordSet]):
     def query(self, recordset_name: str):
         return self.get(recordset_name)
 
-    def remove(self, name: str):
+    def remove(self, name: str) -> 'HarvestRecordSets':
         self.pop(name)
         return self
 
-    def rename(self, old_recordset_name: str, new_recordset_name: str):
+    def rename(self, old_recordset_name: str, new_recordset_name: str) -> 'HarvestRecordSets':
         self[new_recordset_name] = self.pop(old_recordset_name)
 
         return self
-
-#
-# if __name__ == '__main__':
-#     test_data = [
-#         {
-#             "FieldA": "A",
-#             "FieldB": "B",
-#             "TagList": [
-#                 {
-#                     "Name": "Something",
-#                     "Value": "Else"
-#                 },
-#                 {
-#                     "Name": "Another",
-#                     "Value": "Tag"
-#                 }
-#             ]
-#         },
-#         {
-#             "FieldA": "A2",
-#             "FieldB": "B2",
-#             "TagList": [
-#                 {
-#                     "Name": "Something2",
-#                     "Value": "Else2"
-#                 },
-#                 {
-#                     "Name": "Another2",
-#                     "Value": "Tag2"
-#                 }
-#             ]
-#         }
-#     ]
-#
-#     with HarvestRecordSet(data=test_data) as hrs:
-#         hrs.modify_records(function='name_value_to_dict', arguments=dict(source_column='TagList',
-#                                                                          name_key='Name',
-#                                                                          value_key='Value',
-#                                                                          target_column='Tags',
-#                                                                          preserve_original=False))
-#
-#         print(hrs)
