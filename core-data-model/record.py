@@ -21,7 +21,7 @@ class HarvestRecord(OrderedDict):
 
         return len(self.non_matching_expressions) == 0
 
-    def add_freshness(self, fresh_range: int = 3600, aging_range: int = 43200):
+    def add_freshness(self, fresh_range: int = 3600, aging_range: int = 43200) -> 'HarvestRecord':
         """
         Add the freshness key to the record. Freshness is determined by the time since the record was last seen and whether the record is active.
 
@@ -59,19 +59,39 @@ class HarvestRecord(OrderedDict):
 
         self['f'] = result
 
-    def add_key_from_keys(self, new_key: str, sequence: List[str], delimiter: str = ' '):
+        return self
+
+    def add_key_from_keys(self, new_key: str, sequence: List[str], delimiter: str = ' ', abort_on_none: bool = False) -> 'HarvestRecord':
         """
-        Add a new key to the record, with its value being a concatenation of the values. If the value is not a key, it
-        is instead interpreted as a literal.
+        This method creates a new key in the record, with its value being a concatenation of the values of the keys provided in the sequence.
+        If a value in the sequence is not a key, it is interpreted as a literal string.
 
-        :param new_key: the name of the new key
-        :param sequence: a list of keys whose values will be concatenated
-        :param delimiter: the delimiter to use when concatenating the values, defaults to ' '
+        :param new_key: The name of the new key to be added to the record.
+        :param sequence: A list of keys whose values will be concatenated to form the value of the new key.
+        :param delimiter: The delimiter to use when concatenating the values. Defaults to a space character.
+        :param abort_on_none: If True, the method will abort if a value in the sequence is None. Defaults to False.
+        :return: The record with the new key added.
         """
 
-        self[new_key] = delimiter.join([self.get(value, value) for value in sequence])
+        result = []
+        for s in sequence:
+            if isinstance(s, dict):
+                subresult = self.get(s.get('key'))
 
-    def assign_elements_at_index_to_key(self, source_key: str, target_key: str, start: int = None, end: int = None, delimiter: str = None):
+            else:
+                subresult = s
+
+            if abort_on_none and subresult is None:
+                return self
+
+            else:
+                result.append(subresult)
+
+        self[new_key] = delimiter.join([str(s) for s in result])
+
+        return self
+
+    def assign_elements_at_index_to_key(self, source_key: str, target_key: str, start: int = None, end: int = None, delimiter: str = None) -> 'HarvestRecord':
         """
         Assign elements at a specific index to a new key.
 
@@ -93,7 +113,9 @@ class HarvestRecord(OrderedDict):
 
         self[target_key] = result
 
-    def cast(self, source_key: str, format_string: str, target_key: str = None):
+        return self
+
+    def cast(self, source_key: str, format_string: str, target_key: str = None) -> 'HarvestRecord':
         """
         Cast the value of a key to a different type.
 
@@ -106,7 +128,9 @@ class HarvestRecord(OrderedDict):
 
         self[target_key or source_key] = cast(self[source_key], format_string)
 
-    def copy_key(self, source_key: str, target_key: str):
+        return self
+
+    def copy_key(self, source_key: str, target_key: str) -> 'HarvestRecord':
         """
         Copy the value of a key to a new key.
 
@@ -116,7 +140,9 @@ class HarvestRecord(OrderedDict):
 
         self[target_key] = self.get(source_key)
 
-    def dict_from_json_string(self, source_key: str, operation: Literal['key', 'merge', 'replace'], new_key: str = None):
+        return self
+
+    def dict_from_json_string(self, source_key: str, operation: Literal['key', 'merge', 'replace'], new_key: str = None) -> 'HarvestRecord':
         """
         Convert a JSON string to a dictionary and perform an operation with it.
 
@@ -142,7 +168,9 @@ class HarvestRecord(OrderedDict):
             case 'replace':
                 self[source_key] = data
 
-    def first_not_null_value(self, *keys):
+        return self
+
+    def first_not_null_value(self, *keys) -> 'HarvestRecord':
         """
         Get the first non-null value among a list of keys.
 
@@ -154,7 +182,9 @@ class HarvestRecord(OrderedDict):
             if self.get(key):
                 return self[key]
 
-    def flatten(self, separator: str = '.'):
+        return self
+
+    def flatten(self, separator: str = '.') -> 'HarvestRecord':
         """
         Flatten the record.
 
@@ -171,8 +201,10 @@ class HarvestRecord(OrderedDict):
 
         self.is_flat = True
 
+        return self
+
     def key_value_list_to_dict(self, source_key: str, name_key: str = 'Name',
-                               value_key: str = 'Value', preserve_original: bool = False, target_key: str = None):
+                               value_key: str = 'Value', preserve_original: bool = False, target_key: str = None) -> 'HarvestRecord':
         """
         Convert a list of key-value pairs to a dictionary.
 
@@ -191,13 +223,28 @@ class HarvestRecord(OrderedDict):
 
         return self
 
-    def clear_matches(self):
+    def list_to_str(self, source_key: str, target_key: str = None, delimiter: str = '\n') -> 'HarvestRecord':
+        """
+        Convert a list to a string.
+
+        :param source_key: the name of the source key
+        :param target_key: the name of the target key, defaults to None
+        :param delimiter: the delimiter to use when joining the elements, defaults to '\n' (newline)
+        """
+
+        self[target_key or source_key] = delimiter.join(self[source_key])
+
+        return self
+
+    def clear_matches(self) -> 'HarvestRecord':
         """
         Clear the matches of the record.
         """
 
         self.matching_expressions.clear()
         self.non_matching_expressions.clear()
+
+        return self
 
     def match(self, syntax: str) -> bool:
         """
@@ -218,7 +265,7 @@ class HarvestRecord(OrderedDict):
 
         return match.is_match
 
-    def remove_key(self, key: str):
+    def remove_key(self, key: str) -> 'HarvestRecord':
         """
         Remove a key from the record.
 
@@ -227,7 +274,9 @@ class HarvestRecord(OrderedDict):
 
         self.pop(key)
 
-    def rename_key(self, old_key, new_key):
+        return self
+
+    def rename_key(self, old_key, new_key) -> 'HarvestRecord':
         """
         Rename a key in the record.
 
@@ -237,7 +286,9 @@ class HarvestRecord(OrderedDict):
 
         self[new_key] = self.pop(old_key)
 
-    def reset_matches(self):
+        return self
+
+    def reset_matches(self) -> 'HarvestRecord':
         """
         Reset the matches of the record.
         """
@@ -245,7 +296,9 @@ class HarvestRecord(OrderedDict):
         self.matching_expressions.clear()
         self.non_matching_expressions.clear()
 
-    def split_key(self, source_key: str, target_key: str = None, delimiter: str = ' '):
+        return self
+
+    def split_key(self, source_key: str, target_key: str = None, delimiter: str = ' ') -> 'HarvestRecord':
         """
         Split the value of a key into a list.
 
@@ -256,7 +309,9 @@ class HarvestRecord(OrderedDict):
 
         self[target_key or source_key] = self[source_key].split(delimiter) if isinstance(self[source_key], str) else self[source_key]
 
-    def substring(self, source_key: str, start: int = None, end: int = None, target_key: str = None):
+        return self
+
+    def substring(self, source_key: str, start: int = None, end: int = None, target_key: str = None) -> 'HarvestRecord':
         """
         Get a substring of the value of a key.
 
@@ -268,7 +323,9 @@ class HarvestRecord(OrderedDict):
 
         self[target_key or source_key] = self[source_key][start:end]
 
-    def unflatten(self, separator: str = '.'):
+        return self
+
+    def unflatten(self, separator: str = '.') -> 'HarvestRecord':
         """
         Unflatten the record.
 
@@ -284,3 +341,5 @@ class HarvestRecord(OrderedDict):
         self.update(unflat)
 
         self.is_flat = False
+
+        return self
