@@ -19,8 +19,8 @@ _MATCH_OPERATIONS = {
 
 
 class HarvestMatch:
-    def __init__(self, record: OrderedDict, syntax: str):
-        self._record = record
+    def __init__(self, syntax: str, record: OrderedDict = None):
+        self._record = record or {}
         self._input = syntax
         self.key = None
         self.value = None
