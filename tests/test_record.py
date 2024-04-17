@@ -45,11 +45,21 @@ class TestHarvestRecord(unittest.TestCase):
         self.record.pop('LastSeen')
 
     def test_add_key_from_keys(self):
-        """
-        Test the add_key_from_keys method
-        """
-        self.record.add_key_from_keys('new_key', ['key1', 'key2'])
-        self.assertEqual(self.record['new_key'], 'value1 value2')
+        # Create a HarvestRecord instance
+        r = record.HarvestRecord()
+
+        # Add some keys to the record
+        r['key1'] = 'Hello'
+        r['key2'] = 'World'
+
+        # Call the add_key_from_keys method
+        r.add_key_from_keys(new_key='greeting',
+                            sequence=[{'key': 'key1'}, {'key': 'key2'}, 'It is me!'],
+                            delimiter=' ',
+                            abort_on_none=False)
+
+        # Assert that the new key has been added with the expected value
+        self.assertEqual(r['greeting'], 'Hello World It is me!')
 
     def test_assign_elements_at_index_to_key(self):
         """
