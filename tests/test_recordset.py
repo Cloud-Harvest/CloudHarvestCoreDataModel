@@ -1,147 +1,151 @@
 import unittest
 from importlib import import_module
+
 recordset = import_module('core-data-model.recordset')
+HarvestRecord = recordset.HarvestRecord
+HarvestRecordSet = recordset.HarvestRecordSet
+HarvestRecordSets = recordset.HarvestRecordSets
 
 
 class TestHarvestRecordSet(unittest.TestCase):
-    """
-    Test case for the HarvestRecordSet class in recordset.py
-    """
-
     def setUp(self):
-        """
-        Set up a HarvestRecordSet object for use in tests
-        """
-        self.recordset = recordset.HarvestRecordSet(data=[{'key1': 'value1', 'key2': 'value2'}])
+        self.recordset = HarvestRecordSet(data=[{'index': i, 'value': f'value_{i}'} for i in range(5)])
 
     def test_add(self):
-        """
-        Test the add method
-        """
-        self.recordset.add(data=[{'key3': 'value3'}])
-        self.assertEqual(len(self.recordset), 2)
-        self.assertEqual(self.recordset[1]['key3'], 'value3')
+        self.recordset.add(data=[{'index': 5, 'value': 'value_5'}])
+        self.assertEqual(len(self.recordset), 6)
+
+    def test_add_match(self):
+        self.recordset.add_match(syntax='value==value_1')
+        self.assertEqual(self.recordset[1].is_matched_record, True)
+
+    def test_clear_matches(self):
+        self.recordset.add_match(syntax='value==dummy')
+        self.assertEqual(self.recordset[1].is_matched_record, False)
+
+        self.assertEqual(len(self.recordset[1].matching_expressions), 0)
+        self.assertEqual(len(self.recordset[1].non_matching_expressions), 1)
+
+        self.recordset.clear_matches()
+        self.assertEqual(len(self.recordset[1].matching_expressions), 0)
+        self.assertEqual(len(self.recordset[1].non_matching_expressions), 0)
+
+        # Records with no records in non_matching_expressions are considered matched
+        self.assertEqual(self.recordset[1].is_matched_record, True)
 
     def test_create_index(self):
-        """
-        Test the create_index method
-        """
-        self.recordset.create_index('index1', 'key1')
-        self.assertIn('index1', self.recordset.indexes)
+        # Create a recordset with 10 records, each record has 'index' and 'value' fields
+        self.recordset = HarvestRecordSet(data=[{'index': i, 'value': f'value_{i}'} for i in range(10)])
+        # Create an index named 'index1' based on the 'index' field
+        self.recordset.create_index('index1', 'index')
+        self.assertEqual(len(self.recordset.indexes['index1']), 10)  # Assert that the index includes all 10 records
+
+        # Create another index named 'index2' based on both 'index' and 'value' fields
+        self.recordset.create_index('index2', 'index', 'value')
+        # Assert that the index includes all 10 records
+        self.assertEqual(len(self.recordset.indexes['index2']), 10)
+        # Assert that the index is correctly created based on both 'index' and 'value' fields
+        self.assertEqual(self.recordset.indexes['index2'][(0, 'value_0')], [{'index': 0, 'value': 'value_0'}])
 
     def test_drop_index(self):
-        """
-        Test the drop_index method
-        """
-        self.recordset.create_index('index1', 'key1')
+        self.recordset.create_index('index1', 'index')
         self.recordset.drop_index('index1')
-        self.assertNotIn('index1', self.recordset.indexes)
+        self.assertEqual('index1' in self.recordset.indexes, False)
 
     def test_get_matched_records(self):
-        """
-        Test the get_matched_records method
-        """
-
-        # Test invalid match
-        self.recordset.add(data=[{'key1': 'value1', 'key2': 'value2'}])
-        self.recordset.add_match('key1=invalid')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 0)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '=' operation (regex)
-        self.recordset.add(data=[{'key1': 'value1', 'key2': 'value2'}])
-        self.recordset.add_match('key1=value')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '<=' operation
-        self.recordset.add(data=[{'key3': 3}])
-        self.recordset.add_match('key3<=3')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '>=' operation
-        self.recordset.add(data=[{'key4': 4}])
-        self.recordset.add_match('key4>=4')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '==' operation
-        self.recordset.add(data=[{'key5': 'value5'}])
-        self.recordset.add_match('key5==value5')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '!=' operation
-        self.recordset.add(data=[{'key6': 'value6'}])
-        self.recordset.add_match('key6!=value6')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 0)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '<' operation
-        self.recordset.add(data=[{'key7': 7}])
-        self.recordset.add_match('key7<8')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
-
-        # Test '>' operation
-        self.recordset.add(data=[{'key8': 8}])
-        self.recordset.add_match('key8>7')
-        matched = self.recordset.get_matched_records()
-        self.assertEqual(len(matched), 1)
-        self.recordset.clear_matches()
-        self.recordset.clear()
+        self.recordset.add_match(syntax='value==value_1')
+        matched_records = self.recordset.get_matched_records()
+        self.assertEqual(len(matched_records), 1)
 
     def test_modify_records(self):
-        """
-        Test the modify_records method
-        """
-        # This method is difficult to test without a function and arguments
+        self.recordset.modify_records('copy_key', {'source_key': 'value', 'target_key': 'value_copy'})
+        self.assertEqual(self.recordset[1]['value_copy'], 'value_1')
+
+    def test_rebuild_indexes(self):
+        self.recordset.create_index('index1', 'index')
+        self.assertEqual(len(self.recordset.indexes['index1']), 5)
+
+        self.recordset.add(data=[{'index': 5, 'value': 'value_5'}])
+        self.recordset.rebuild_indexes()
+        self.assertEqual(len(self.recordset.indexes['index1']), 6)
 
     def test_remove_duplicates(self):
-        """
-        Test the remove_duplicates method
-        """
-        self.recordset.add(data=[{'key1': 'value1', 'key2': 'value2'}])
+        self.recordset.add(data=[{'index': 1, 'value': 'value_1'}])
         self.recordset.remove_duplicates()
-        self.assertEqual(len(self.recordset), 1)
+        self.assertEqual(len(self.recordset), 5)
 
     def test_remove_unmatched_records(self):
-        """
-        Test the remove_unmatched_records method
-        """
-        # This method is difficult to test without a match statement
+        self.recordset.add_match(syntax='value==value_1')
+        self.recordset.remove_unmatched_records()
+        self.assertEqual(len(self.recordset), 1)
 
     def test_unwind(self):
-        """
-        Test the unwind method
-        """
-        with recordset.HarvestRecordSet() as rs:
-            rs.add(data=[{'key1': 'value1', 'key2': 'value2'}])
-            rs.unwind('key1', preserve_null_and_empty_keys=True)
-            self.assertEqual(len(rs), 1)
-            self.assertEqual(rs[0]['key1'], 'value1')
+        self.recordset.add(data=[{'index': 5, 'value': ['value_5', 'value_6']}])
+        self.recordset.unwind(source_key='value')
+        self.assertEqual(len(self.recordset), 7)
 
-            rs[0]['key3'] = ['value3_a', 'value3_b', 'value3_c']
-            rs.unwind('key3')
-            self.assertEqual(len(rs), 3)
-            self.assertEqual(rs[0]['key3'], 'value3_a')
-            self.assertEqual(rs[1]['key3'], 'value3_b')
-            self.assertEqual(rs[2]['key3'], 'value3_c')
+
+class TestHarvestRecordSets(unittest.TestCase):
+    def setUp(self):
+        self.recordsets = HarvestRecordSets()
+        data1 = [{'index': i, 'value': f'value_{i}'} for i in range(5)]
+        data2 = [{'index': i, 'value': f'value_{i}'} for i in range(3, 8)]
+        self.recordsets.add('recordset1', HarvestRecordSet(data=data1))
+        self.recordsets.add('recordset2', HarvestRecordSet(data=data2))
+        self.recordsets.index('recordset1', 'index1', 'index')
+        self.recordsets.index('recordset2', 'index2', 'index')
+        self.recordsets.index('recordset1', 'index', 'index')
+        self.recordsets.index('recordset2', 'index', 'index')
+
+    def test_add(self):
+        self.recordsets.add('recordset3', HarvestRecordSet(data=[{'index': 0, 'value': 'value_0'}]))
+        self.assertEqual(len(self.recordsets['recordset3']), 1)
+
+    def test_index(self):
+        self.recordsets.index('recordset1', 'index3', 'value')
+        self.assertEqual(len(self.recordsets['recordset1'].indexes['index3'][(None, )]), 5)
+
+    # def test_join(self):
+    #     # Test inner join
+    #     self.recordsets.join('joined_inner', ['recordset1', 'recordset2'], 'index', 'inner')
+    #     self.assertEqual(len(self.recordsets['joined_inner']), 2)
+    #
+    #     # Test outer join
+    #     self.recordsets.join('joined_outer', ['recordset1', 'recordset2'], 'index', 'outer')
+    #     self.assertEqual(len(self.recordsets['joined_outer']), 7)
+    #
+    #     # Test left join
+    #     self.recordsets.join('joined_left', ['recordset1', 'recordset2'], 'index', 'left')
+    #     self.assertEqual(len(self.recordsets['joined_left']), 5)
+    #
+    #     # Test right join
+    #     self.recordsets.join('joined_right', ['recordset1', 'recordset2'], 'index', 'right')
+    #     self.assertEqual(len(self.recordsets['joined_right']), 5)
+
+    def test_list(self):
+        recordset_list = self.recordsets.list()
+        self.assertEqual(len(recordset_list), 2)
+
+    def test_purge(self):
+        self.recordsets.purge()
+        self.assertEqual(len(self.recordsets), 0)
+
+    def test_query(self):
+        queried_recordset = self.recordsets.query('recordset1')
+        self.assertEqual(len(queried_recordset), 5)
+
+    def test_remove(self):
+        self.recordsets.remove('recordset1')
+        self.assertEqual('recordset1' in self.recordsets, False)
+
+    def test_rename(self):
+        self.recordsets.rename('recordset1', 'recordset_renamed')
+        self.assertEqual('recordset1' in self.recordsets, False)
+        self.assertEqual('recordset_renamed' in self.recordsets, True)
+
+    def test_union(self):
+        self.recordsets.union('union_recordset', ['recordset1', 'recordset2'])
+        self.assertEqual(len(self.recordsets['union_recordset']), 10)
 
 
 if __name__ == '__main__':

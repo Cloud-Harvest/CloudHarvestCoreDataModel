@@ -3,7 +3,7 @@ from .record import HarvestRecord
 
 
 class HarvestRecordSet(List[HarvestRecord]):
-    def __init__(self, data: List[Dict] = None, **kwargs):
+    def __init__(self, name: str = None, data: List[Dict] = None, **kwargs):
         """
         Initialize a HarvestRecordSet object.
 
@@ -13,7 +13,11 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         super().__init__(**kwargs)
 
+        from uuid import uuid4
+        self.name = name or str(uuid4())
+
         self.indexes = {}
+        self.index_fields = {}
 
         if data:
             self.add(data=data)
@@ -48,6 +52,8 @@ class HarvestRecordSet(List[HarvestRecord]):
             for record in data
         ]
 
+        self.rebuild_indexes()
+
         return self
 
     def add_match(self, syntax: str) -> 'HarvestRecordSet':
@@ -70,7 +76,7 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         return self
 
-    def create_index(self, index_name: str, *fields: List[str]) -> 'HarvestRecordSet':
+    def create_index(self, index_name: str, *fields) -> 'HarvestRecordSet':
         """
         Create an index for the record set.
 
@@ -78,10 +84,20 @@ class HarvestRecordSet(List[HarvestRecord]):
         :param fields: The fields to include in the index
 
         """
-        self.indexes[index_name] = {
-            frozenset(record.get(field) for field in fields): record
-            for record in self
-        }
+
+        index = {}
+        for record in self:
+            # Sometimes a dictionary may not have the associated field. In this case, we will use None as the value.
+            key = tuple(record.get(field) for field in fields)
+
+            if key in index:
+                index[key].append(record)
+
+            else:
+                index[key] = [record]
+
+        self.indexes[index_name] = index
+        self.index_fields[index_name] = fields
 
         return self
 
@@ -115,6 +131,19 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         [getattr(record, function)(**arguments) for record in self]
 
+        self.rebuild_indexes()
+
+        return self
+
+    def rebuild_indexes(self):
+        """
+        Rebuild all indexes for the record set.
+        """
+
+        self.indexes.clear()
+        for index_name, fields in self.index_fields.items():
+            self.create_index(index_name, *fields)
+
         return self
 
     def remove_duplicates(self) -> 'HarvestRecordSet':
@@ -130,6 +159,8 @@ class HarvestRecordSet(List[HarvestRecord]):
         self.clear()
         self.add(data=list(unique_records.values()))
 
+        self.rebuild_indexes()
+
         return self
 
     def remove_unmatched_records(self) -> 'HarvestRecordSet':
@@ -139,8 +170,10 @@ class HarvestRecordSet(List[HarvestRecord]):
 
         self[:] = [
             record for record in self
-            if not record.is_matched_record
+            if record.is_matched_record
         ]
+
+        self.rebuild_indexes()
 
         return self
 
@@ -179,11 +212,48 @@ class HarvestRecordSets(Dict[str, HarvestRecordSet]):
 
         return self
 
-    def index(self, recordset_name: str, index_name: str, fields: List[str]) -> 'HarvestRecordSets':
+    def index(self, recordset_name: str, index_name: str, *fields) -> 'HarvestRecordSets':
+        self[recordset_name].create_index(index_name, fields)
+
         return self
 
-    def join(self, new_recordset_name: str, recordset_names: List[str], index_name: str, join_type: Literal['inner', 'outer', 'left', 'right']) -> 'HarvestRecordSets':
-        return self
+    # TODO: implement join() of two or more HarvestRecordSets
+    # def join(self, new_recordset_name: str, recordset_names: List[str], index_name: str,
+    #          join_type: Literal['inner', 'outer', 'left', 'right']) -> 'HarvestRecordSets':
+    #
+    #     # Retrieve the recordsets
+    #     recordsets = [self[recordset_name] for recordset_name in recordset_names]
+    #
+    #     # Retrieve the indexes
+    #     indexes = [recordset.indexes[index_name] for recordset in recordsets if recordset.indexes.get(index_name)]
+    #
+    #     # Perform the join operation
+    #     match join_type:
+    #         case 'inner':
+    #             joined_data = []
+    #             for index in indexes:
+    #                 joined_data.extend(index)
+    #
+    #
+    #         case 'outer':
+    #             joined_data = set.union(*map(set, indexes))
+    #
+    #         case 'left':
+    #             joined_data = set(indexes[0]).union(*indexes[1:])
+    #
+    #         case 'right':
+    #             joined_data = set(indexes[-1]).union(*indexes[:-1])
+    #
+    #         case _:
+    #             raise ValueError('Invalid join type')
+    #
+    #     # Create a new recordset with the joined data
+    #     new_recordset = HarvestRecordSet(data=joined_data)
+    #
+    #     # Add the new recordset to the dictionary
+    #     self[new_recordset_name] = new_recordset
+    #
+    #     return self
 
     def list(self) -> List[dict]:
         return [
@@ -210,5 +280,13 @@ class HarvestRecordSets(Dict[str, HarvestRecordSet]):
 
     def rename(self, old_recordset_name: str, new_recordset_name: str) -> 'HarvestRecordSets':
         self[new_recordset_name] = self.pop(old_recordset_name)
+
+        return self
+
+    def union(self, new_recordset_name: str, recordset_names: List[str]) -> 'HarvestRecordSets':
+        new_recordset = HarvestRecordSet()
+        [new_recordset.add(data=self[recordset_name]) for recordset_name in recordset_names]
+
+        self[new_recordset_name] = new_recordset
 
         return self
