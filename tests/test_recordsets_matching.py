@@ -1,7 +1,6 @@
 import unittest
 from collections import OrderedDict
-from importlib import import_module
-matching = import_module('core-data-model.matching')
+from data import matching
 
 
 class TestMatching(unittest.TestCase):
@@ -16,7 +15,7 @@ class TestMatching(unittest.TestCase):
         # Test creating a HarvestMatch object and calling the match method
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value1'
-        match = matching.HarvestMatch(record, syntax)
+        match = matching.HarvestMatch(record=record, syntax=syntax)
         self.assertTrue(match.match())
         self.assertEqual(match.final_match_operation, 'value1=value1')
         self.assertTrue(match.is_match)
@@ -24,7 +23,7 @@ class TestMatching(unittest.TestCase):
         # Test creating a HarvestMatch object with a non-matching record
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
         syntax = 'key1=value2'
-        match = matching.HarvestMatch(record, syntax)
+        match = matching.HarvestMatch(record=record, syntax=syntax)
         self.assertFalse(match.match())
         self.assertEqual(match.final_match_operation, 'value1=value2')
         self.assertFalse(match.is_match)

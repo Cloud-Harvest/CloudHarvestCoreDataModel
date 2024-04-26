@@ -1,7 +1,6 @@
 import unittest
-from importlib import import_module
+from data import recordset
 
-recordset = import_module('core-data-model.recordset')
 HarvestRecord = recordset.HarvestRecord
 HarvestRecordSet = recordset.HarvestRecordSet
 HarvestRecordSets = recordset.HarvestRecordSets

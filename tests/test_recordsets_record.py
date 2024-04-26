@@ -1,7 +1,5 @@
 import unittest
-from collections import OrderedDict
-from importlib import import_module
-record = import_module('core-data-model.record')
+from data import record
 
 
 class TestHarvestRecord(unittest.TestCase):

@@ -1,6 +1,5 @@
 import unittest
-from importlib import import_module
-functions = import_module('core-data-model.functions')
+from recordsets import functions
 
 
 class TestFunctions(unittest.TestCase):
