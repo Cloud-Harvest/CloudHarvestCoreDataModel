@@ -1,5 +1,5 @@
 import unittest
-from data import recordset
+from recordsets import recordset
 
 HarvestRecord = recordset.HarvestRecord
 HarvestRecordSet = recordset.HarvestRecordSet

@@ -1,6 +1,6 @@
 import unittest
 from collections import OrderedDict
-from data import matching
+from recordsets import matching
 
 
 class TestMatching(unittest.TestCase):
@@ -34,17 +34,21 @@ class TestMatching(unittest.TestCase):
         """
         # Test creating a HarvestMatchSet object
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
-        syntax = 'key1=value1'
         matches = ['key1=value1', 'key2=value2']
-        match_set = matching.HarvestMatchSet(record, syntax, matches)
+        match_set = matching.HarvestMatchSet(matches=matches, record=record)
         self.assertEqual(len(match_set.matches), 2)
+
+        # Test creating a HarvestMatchSet object with successful matches
+        record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
+        matches = ['key1=value1']
+        match_set = matching.HarvestMatchSet(matches=matches, record=record)
+        self.assertTrue(len(match_set.matches[0].match()), 0)
 
         # Test creating a HarvestMatchSet object with no matches
         record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
-        syntax = 'key1=value1'
-        matches = []
-        match_set = matching.HarvestMatchSet(record, syntax, matches)
-        self.assertEqual(len(match_set.matches), 0)
+        matches = ['key1=DERP']
+        match_set = matching.HarvestMatchSet(matches=matches, record=record)
+        self.assertFalse(len(match_set.matches[0].match()), 0)
 
 
 if __name__ == '__main__':
