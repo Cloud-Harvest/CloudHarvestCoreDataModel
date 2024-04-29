@@ -13,20 +13,56 @@ class TestMatching(unittest.TestCase):
         Test the HarvestMatch class with different types of inputs
         """
         # Test creating a HarvestMatch object and calling the match method
-        record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
-        syntax = 'key1=value1'
+        record = OrderedDict([('key1', '1'), ('key2', '2')])
+
+        # Test '==' operator
+        syntax = 'key1==1'
         match = matching.HarvestMatch(record=record, syntax=syntax)
         self.assertTrue(match.match())
-        self.assertEqual(match.final_match_operation, 'value1=value1')
+        self.assertEqual(match.final_match_operation, '1==1')
         self.assertTrue(match.is_match)
 
-        # Test creating a HarvestMatch object with a non-matching record
-        record = OrderedDict([('key1', 'value1'), ('key2', 'value2')])
-        syntax = 'key1=value2'
+        # Test '>=' operator
+        syntax = 'key2>=2'
         match = matching.HarvestMatch(record=record, syntax=syntax)
-        self.assertFalse(match.match())
-        self.assertEqual(match.final_match_operation, 'value1=value2')
-        self.assertFalse(match.is_match)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '2>=2')
+        self.assertTrue(match.is_match)
+
+        # Test '<=' operator
+        syntax = 'key2<=2'
+        match = matching.HarvestMatch(record=record, syntax=syntax)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '2<=2')
+        self.assertTrue(match.is_match)
+
+        # Test '!=' operator
+        syntax = 'key1!=2'
+        match = matching.HarvestMatch(record=record, syntax=syntax)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '1!=2')
+        self.assertTrue(match.is_match)
+
+        # Test '>' operator
+        syntax = 'key2>1'
+        match = matching.HarvestMatch(record=record, syntax=syntax)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '2>1')
+        self.assertTrue(match.is_match)
+
+        # Test '<' operator
+        syntax = 'key1<2'
+        match = matching.HarvestMatch(record=record, syntax=syntax)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '1<2')
+        self.assertTrue(match.is_match)
+
+        # Test '=' operator
+        syntax = 'key1=1'
+        match = matching.HarvestMatch(record=record, syntax=syntax)
+        self.assertTrue(match.match())
+        self.assertEqual(match.final_match_operation, '1=1')
+        self.assertTrue(match.is_match)
 
     def test_HarvestMatchSet(self):
         """
