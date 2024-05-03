@@ -1,24 +1,21 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "CloudHarvestCoreDataModel"
 version = "0.1.0"
 description = "This is the Core Data Model for CloudHarvest."
-authors = [
-    {name = "Cloud Harvest"}, {name = "Fiona June Leathers"}
-]
+authors = ["Cloud Harvest", "Fiona June Leathers"]
 license = "MIT"
 readme = "README.md"
 
-[project.urls]
+[tool.poetry.urls]
 homepage = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 repository = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 
-[project.scripts]
-# Define your command-line scripts here
-
-[project.dependencies]
+[tool.poetry.dependencies]
+python = "^3.12"
 Authlib = "*"
 Flask = "*"
 Jinja2 = "*"
@@ -31,5 +28,8 @@ rich-argparse = "*"
 setuptools = "*"
 CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git" }
 
-[project.dev-dependencies]
+[tool.poetry.dev-dependencies]
 pytest = "*"
+
+[tool.poetry.scripts]
+# Define your command-line scripts here
