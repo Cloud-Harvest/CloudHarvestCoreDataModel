@@ -1,4 +1,4 @@
-from core.tasks.tasks.base import BaseTask, TaskStatusCodes
+from cloud_harvest_core_tasks.base import BaseTask, TaskStatusCodes
 from .recordset import HarvestRecordSet
 
 

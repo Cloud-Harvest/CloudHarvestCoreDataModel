@@ -1,3 +1,4 @@
 flatten-json
 pytest
 setuptools
+git+ssh://git@github.com/Cloud-Harvest/CloudHarvestCoreTasks.git
