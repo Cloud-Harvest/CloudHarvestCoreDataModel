@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "CloudHarvestCoreDataModel"
+version = "0.1.0"
+description = "This is the Core Data Model for CloudHarvest."
+authors = [
+    {name = "Cloud Harvest"}, {name = "Fiona June Leathers"}
+]
+license = "MIT"
+readme = "README.md"
+
+[project.urls]
+homepage = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
+repository = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
+
+[project.scripts]
+# Define your command-line scripts here
+
+[project.dependencies]
+Authlib = "*"
+Flask = "*"
+Jinja2 = "*"
+PyYAML = "*"
+flatten-json = "*"
+pandas = "*"
+pymongo = "*"
+python-dateutil = "*"
+rich-argparse = "*"
+setuptools = "*"
+CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git" }
+
+[project.dev-dependencies]
+pytest = "*"
