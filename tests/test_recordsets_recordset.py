@@ -1,5 +1,5 @@
 import unittest
-from recordsets import recordset
+from cloud_harvest_core_data_model import recordset
 
 HarvestRecord = recordset.HarvestRecord
 HarvestRecordSet = recordset.HarvestRecordSet

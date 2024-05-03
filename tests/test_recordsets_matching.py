@@ -1,6 +1,6 @@
 import unittest
 from collections import OrderedDict
-from recordsets import matching
+from cloud_harvest_core_data_model import matching
 
 
 class TestMatching(unittest.TestCase):

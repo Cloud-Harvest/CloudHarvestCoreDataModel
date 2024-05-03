@@ -9,7 +9,8 @@ setup(
     description='This is the CoreDataModel for CloudHarvest.',
     author='Cloud Harvest',
     url='https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel',
-    packages=find_packages(exclude=['tests', 'tests.*']),
+    packages=find_packages(exclude=['tests', 'tests.*'],
+                           include=['cloud_harvest_core_data_model.*']),
     install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',

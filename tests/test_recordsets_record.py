@@ -1,5 +1,5 @@
 import unittest
-from recordsets import record
+from cloud_harvest_core_data_model import record
 
 
 class TestHarvestRecord(unittest.TestCase):
@@ -11,7 +11,6 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Set up a HarvestRecord object for use in tests
         """
-        from datetime import datetime
         self.record = record.HarvestRecord(key1='value1', key2='value2')
 
     def test_add_freshness(self):
