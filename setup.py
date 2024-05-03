@@ -4,7 +4,7 @@ with open('requirements.txt', 'r') as f:
     requirements = f.read().splitlines()
 
 setup(
-    name='CloudHarvestApi',
+    name='CloudHarvestCoreDataModel',
     version='0.1.0',
     description='This is the CoreDataModel for CloudHarvest.',
     author='Cloud Harvest',
