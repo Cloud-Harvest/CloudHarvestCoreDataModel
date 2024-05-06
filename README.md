@@ -1,6 +1,19 @@
 # Harvest Core Data Model
 The CDM is responsible for converting parameters into data manipulation instructions the API, CLI, or Data Collectors can interpret. This module is not intended as a standalone resource; rather, a git submodule.
 
+# License
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+
+# Usage
 The most direct example of this is record matching using the CLI:
 ```
 [] report rds.clusters -m Account=dev
