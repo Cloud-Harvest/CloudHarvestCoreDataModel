@@ -7,15 +7,18 @@ name = "CloudHarvestCoreDataModel"
 version = "0.1.0"
 description = "This is the Core Data Model for CloudHarvest."
 authors = ["Cloud Harvest", "Fiona June Leathers"]
-license = "MIT"
+license = "CC Attribution-NonCommercial-ShareAlike 4.0 International"
 readme = "README.md"
+
+[[tool.poetry.packages]]
+include = "cloud_harvest_core_data_model"
 
 [tool.poetry.urls]
 homepage = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 repository = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.10"
 Authlib = "*"
 Flask = "*"
 Jinja2 = "*"
