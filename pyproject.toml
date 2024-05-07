@@ -11,7 +11,7 @@ license = "CC Attribution-NonCommercial-ShareAlike 4.0 International"
 readme = "README.md"
 
 [[tool.poetry.packages]]
-include = "cloud_harvest_core_data_model"
+include = "CloudHarvestCoreDataModel"
 
 [tool.poetry.urls]
 homepage = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"

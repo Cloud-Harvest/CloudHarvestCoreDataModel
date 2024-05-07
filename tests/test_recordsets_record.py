@@ -1,5 +1,5 @@
 import unittest
-from cloud_harvest_core_data_model import record
+from CloudHarvestCoreDataModel import record
 
 
 class TestHarvestRecord(unittest.TestCase):

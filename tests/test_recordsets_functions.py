@@ -1,5 +1,5 @@
 import unittest
-from cloud_harvest_core_data_model import functions
+from CloudHarvestCoreDataModel import functions
 
 
 class TestFunctions(unittest.TestCase):
