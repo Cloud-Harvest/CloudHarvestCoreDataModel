@@ -18,7 +18,13 @@ homepage = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 repository = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+# Harvest Core Modules
+CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git" }
+
+# Python dependencies
+# The lower version of python satisfies the requirements of several dependencies
+# Actual testing and development is done with Python 3.12
+python = ">=3.7"
 Authlib = "*"
 Flask = "*"
 Jinja2 = "*"
@@ -29,7 +35,6 @@ pymongo = "*"
 python-dateutil = "*"
 rich-argparse = "*"
 setuptools = "*"
-CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git" }
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
