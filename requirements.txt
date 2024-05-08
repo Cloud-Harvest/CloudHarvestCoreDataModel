@@ -1,8 +1,12 @@
+CloudHarvestCoreTasks @ git+https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git@main
 Flask
 Jinja2
 PyYAML
 flatten-json
 pandas
 pymongo
+pytest
 python-dateutil
 rich-argparse
+setuptools
+wheel
