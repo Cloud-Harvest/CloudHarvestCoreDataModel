@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core>=1.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
@@ -21,9 +21,8 @@ repository = "https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel"
 # Harvest Core Modules
 CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCoreTasks.git" }
 
-# Python dependencies
-# The lower version of python satisfies the requirements of several dependencies
-# Actual testing and development is done with Python 3.12
+# External Dependencies
+# Note that python packages should be installed with pip, not poetry
 python = "~3.12"
 
 [tool.poetry.dev-dependencies]
