@@ -24,7 +24,7 @@ CloudHarvestCoreTasks = { git = "https://github.com/Cloud-Harvest/CloudHarvestCo
 # Python dependencies
 # The lower version of python satisfies the requirements of several dependencies
 # Actual testing and development is done with Python 3.12
-python = ">=3.10"
+python = ">3.9,<3.13"
 Authlib = "*"
 Flask = "*"
 Jinja2 = "*"
@@ -34,7 +34,6 @@ pandas = "*"
 pymongo = "*"
 python-dateutil = "*"
 rich-argparse = "*"
-setuptools = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
