@@ -11,7 +11,10 @@ config = dict(name="CloudHarvestCoreDataModel",
               license="CC Attribution-NonCommercial-ShareAlike 4.0 International",
               url="https://github.com/Cloud-Harvest/CloudHarvestCoreDataModel",
               packages=find_packages(),
-              install_requires=requirements)
+              install_requires=requirements,
+              classifiers=[
+                  'Programming Language :: Python :: 3.12',
+              ])
 
 
 def main():
