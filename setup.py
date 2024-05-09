@@ -13,4 +13,10 @@ config = dict(name="CloudHarvestCoreDataModel",
               packages=find_packages(),
               install_requires=requirements)
 
-setup(**config)
+
+def main():
+    setup(**config)
+
+
+if __name__ == '__main__':
+    main()
