@@ -1,7 +1,9 @@
 from CloudHarvestCoreTasks.base import BaseTask, TaskStatusCodes
+from CloudHarvestCorePluginManager.decorators import register_definition
 from .recordset import HarvestRecordSet
 
 
+@register_definition
 class RecordSetTask(BaseTask):
     """
     The RecordSetTask class is a subclass of the BaseTask class. It represents a task that operates on a record set.
