@@ -4,9 +4,9 @@ from .recordset import HarvestRecordSet
 
 
 @register_definition
-class RecordSetTask(BaseTask):
+class RecordsetTask(BaseTask):
     """
-    The RecordSetTask class is a subclass of the BaseTask class. It represents a task that operates on a record set.
+    The RecordsetTask class is a subclass of the BaseTask class. It represents a task that operates on a record set.
 
     Attributes:
         recordset_name (HarvestRecordSet): The name of the record set this task operates on.
@@ -19,7 +19,7 @@ class RecordSetTask(BaseTask):
 
     def __init__(self, recordset_name: HarvestRecordSet, function: str, arguments: dict, *args, **kwargs):
         """
-        Constructs a new RecordSetTask instance.
+        Constructs a new RecordsetTask instance.
 
         Args:
             recordset_name (HarvestRecordSet): The name of the record set this task operates on.
@@ -39,9 +39,25 @@ class RecordSetTask(BaseTask):
         Executes the function on the record set with the provided arguments and stores the result in the data attribute.
 
         Returns:
-            self: Returns the instance of the RecordSetTask.
+            self: Returns the instance of the RecordsetTask.
         """
-        recordset = self.task_chain.get_variables_by_names(self.recordset_name)
-        self.data = getattr(recordset, self.function)(**self.arguments)
+        from .record import HarvestRecord
+        recordset = self.task_chain.get_variables_by_names(self.recordset_name).get(self.recordset_name)
+
+        # This is a HarvestRecordSet command
+        if hasattr(HarvestRecordSet, self.function):
+            getattr(recordset, self.function)(**self.arguments)
+
+        # This is a HarvestRecord command
+        elif hasattr(HarvestRecord, self.function):
+            [
+                getattr(record, self.function)(**self.arguments)
+                for record in recordset
+            ]
+
+        else:
+            raise AttributeError(f"Neither HarvestRecordSet nor HarvestRecord has a method named '{self.function}'")
+
+        self.data = recordset
 
         return self
