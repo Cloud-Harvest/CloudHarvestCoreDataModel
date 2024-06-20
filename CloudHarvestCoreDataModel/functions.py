@@ -155,7 +155,10 @@ def key_value_list_to_dict(value: List[Dict], key_name: str = 'Key', value_name:
     :param value_name: The key name to use for the value in the dictionary
     :return: A dictionary of key value pairs
     """
-    return {item[key_name]: item.get(value_name) for item in value if key_name in item.keys()}
+    return {
+        item[key_name]: item.get(value_name)
+        for item in value if key_name in item.keys()
+    }
 
 
 if __name__ == '__main__':
