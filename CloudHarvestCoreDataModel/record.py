@@ -4,9 +4,10 @@ from .matching import HarvestMatch
 
 
 class HarvestRecord(OrderedDict):
-    def __init__(self, is_flat: bool = False, **kwargs):
+    def __init__(self, recordset=False, is_flat: bool = False, **kwargs):
         super().__init__(**kwargs)
 
+        self.recordset = recordset
         self.is_flat = is_flat
         self.matching_expressions = []
         self.non_matching_expressions = []
