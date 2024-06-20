@@ -37,20 +37,36 @@ class HarvestRecordSet(List[HarvestRecord]):
     def keys(self) -> List[str]:
         return sorted(list(set([key for record in self for key in record.keys()])))
 
-    def add(self, data: List[dict or HarvestRecord]) -> 'HarvestRecordSet':
+    def add(self, data: (List[dict or HarvestRecord]) or dict or HarvestRecord) -> 'HarvestRecordSet':
         """
         Add a list of records to the record set.
 
-        :param data: A list of dictionaries or HarvestRecord objects to add to the record set. If the object is a
-        dictionary, it will automatically be converted to a HarvestRecord.
+        This method accepts a list of dictionaries or HarvestRecord objects, a single dictionary, or a single HarvestRecord object.
+        If the input is a dictionary, it will be automatically converted to a HarvestRecord.
+        If the input is a HarvestRecord, it will be directly appended to the record set.
+        If the input is a list, each element in the list will be appended to the record set. If an element is a dictionary, it will be converted to a HarvestRecord.
+
+        After adding the new data, the indexes of the record set are rebuilt.
+
+        Args:
+            data (Union[List[Union[dict, 'HarvestRecord']], dict, 'HarvestRecord']): A list of dictionaries or HarvestRecord objects to add to the record set. If the object is a dictionary, it will automatically be converted to a HarvestRecord.
+
+        Returns:
+            HarvestRecordSet: The current HarvestRecordSet instance.
         """
 
-        [
-            self.append(record)
-            if isinstance(record, HarvestRecord)
-            else self.append(HarvestRecord(**record))
-            for record in data
-        ]
+        if isinstance(data, dict):
+            self.append(HarvestRecord(recordset=self, **data))
+
+        elif isinstance(data, HarvestRecord):
+            data.recordset = self
+            self.append(data)
+
+        elif isinstance(data, list):
+            [
+                self.add(item)
+                for item in data
+            ]
 
         self.rebuild_indexes()
 
