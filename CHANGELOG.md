@@ -1,3 +1,6 @@
+# 0.2.3
+- Updated to conform with CloudHarvestCorePluginManager 0.2.4
+
 # 0.2.2
 - HarvestRecord now attaches its HarvestRecordSet when the `add()` method is called
 - `HarvestRecordSet.add()` is now recursive

@@ -1,5 +1,4 @@
 import unittest
-from CloudHarvestCoreDataModel.tasks import RecordsetTask
 from CloudHarvestCoreDataModel.recordset import HarvestRecordSet
 from datetime import datetime
 
@@ -12,11 +11,21 @@ test_task_template = {
                 "name": "test recordset task",
                 "description": "This is a test record set",
                 "recordset_name": "test_recordset",
-                "function": "key_value_list_to_dict",
-                "arguments": {
-                    "source_key": "tags",
-                    "target_key": "tags_dict"
-                },
+                "stages": [
+                    {
+                        "key_value_list_to_dict": {
+                            "source_key": "tags",
+                            "target_key": "tags_dict"
+                        }
+                    },
+                    {
+                        "copy_key": {
+                            "source_key": "age",
+                            "target_key": "age_copy"
+                        }
+                    }
+
+                ],
                 "results_as": "result"
             }
         }
@@ -43,6 +52,9 @@ test_data = [
 
 class TestRecordSetTask(unittest.TestCase):
     def setUp(self):
+        # import required to register class
+        from CloudHarvestCoreDataModel.tasks import RecordsetTask
+
         self.recordset = HarvestRecordSet(data=test_data)
 
         from CloudHarvestCoreTasks.base import BaseTaskChain
@@ -58,6 +70,10 @@ class TestRecordSetTask(unittest.TestCase):
         result = self.chain.result
         self.assertEqual(result["data"][0]["tags_dict"], {"color": "blue", "size": "large"})
         self.assertEqual(result["data"][1]["tags_dict"], {"color": "red", "size": "medium"})
+        [
+            self.assertEqual(record["age"], record["age_copy"])
+            for record in result["data"]
+        ]
 
 
 if __name__ == '__main__':
