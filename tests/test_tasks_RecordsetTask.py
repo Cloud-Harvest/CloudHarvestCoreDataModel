@@ -15,7 +15,8 @@ test_task_template = {
                     {
                         "key_value_list_to_dict": {
                             "source_key": "tags",
-                            "target_key": "tags_dict"
+                            "target_key": "tags_dict",
+                            "name_key": "Name"
                         }
                     },
                     {
@@ -53,7 +54,7 @@ test_data = [
 class TestRecordSetTask(unittest.TestCase):
     def setUp(self):
         # import required to register class
-        from CloudHarvestCoreDataModel.tasks import RecordsetTask
+        from CloudHarvestCoreDataModel.tasks import HarvestRecordSetTask
 
         self.recordset = HarvestRecordSet(data=test_data)
 

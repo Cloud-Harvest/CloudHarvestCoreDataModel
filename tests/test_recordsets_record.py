@@ -147,7 +147,7 @@ class TestHarvestRecord(unittest.TestCase):
         """
         Test the key_value_list_to_dict method
         """
-        self.record['KV'] = [{'Name': 'name', 'Value': 'value'}]
+        self.record['KV'] = [{'Key': 'name', 'Value': 'value'}]
         self.record.key_value_list_to_dict('KV')
         self.assertEqual(self.record['KV'], {'name': 'value'})
 

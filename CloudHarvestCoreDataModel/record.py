@@ -204,20 +204,22 @@ class HarvestRecord(OrderedDict):
 
         return self
 
-    def key_value_list_to_dict(self, source_key: str, name_key: str = 'Name',
+    def key_value_list_to_dict(self, source_key: str, name_key: str = 'Key',
                                value_key: str = 'Value', preserve_original: bool = False, target_key: str = None) -> 'HarvestRecord':
         """
         Convert a list of key-value pairs to a dictionary.
 
         :param source_key: the name of the source key
         :param target_key: when provided, the result is placed in a new key, defaults to None
-        :param name_key: the name of the key in the source list, defaults to 'Name'
+        :param name_key: the name of the key in the source list, defaults to 'Key'
         :param value_key: the name of the value in the source list, defaults to 'Value'
         :param preserve_original: whether to preserve the original key, defaults to False
         """
 
         from .functions import key_value_list_to_dict
-        self[target_key or source_key] = key_value_list_to_dict(value=self[source_key], key_name=name_key, value_name=value_key)
+        self[target_key or source_key] = key_value_list_to_dict(value=self[source_key],
+                                                                key_name=name_key,
+                                                                value_name=value_key)
 
         if not preserve_original and target_key and target_key != source_key:
             self.pop(source_key)

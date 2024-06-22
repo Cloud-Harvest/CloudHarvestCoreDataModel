@@ -1,3 +1,8 @@
+# 0.2.4
+- `HarvestRecord.key_value_list_to_dict(name_key: str)` default changed from `Name` to `Key`
+- Expanded [README](./README.md) with documentation on callable `HarvestRecord` and `HarvestRecordSet` methods used for `RecordsetTask`
+- Renamed `RecordsetTask` to `HarvestRecordSetTask`
+
 # 0.2.3
 - Updated to conform with CloudHarvestCorePluginManager 0.2.4
 
